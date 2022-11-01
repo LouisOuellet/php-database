@@ -10,7 +10,11 @@ class Database {
 
   protected $connection = null;
 
-  public function __construct($host, $username, $password, $database) {
+  public function __construct($host = null, $username = null, $password = null, $database = null) {
+    if($host == null && defined('DB_HOST')){ $host = DB_HOST; }
+    if($username == null && defined('DB_USERNAME')){ $username = DB_USERNAME; }
+    if($password == null && defined('DB_PASSWORD')){ $password = DB_PASSWORD; }
+    if($database == null && defined('DB_DATABASE_NAME')){ $database = DB_DATABASE_NAME; }
     try {
       $this->connection = new mysqli($host, $username, $password, $database);
       if ( mysqli_connect_errno()) {

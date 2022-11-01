@@ -34,6 +34,41 @@ composer require laswitchtech/php-database
 In this documentations, we will use a table called users for our examples.
 
 ### Examples
+#### Connecting Database
+##### Using Constant
+```php
+
+//Import Database class into the global namespace
+//These must be at the top of your script, not inside a function
+use LaswitchTech\phpDB\Database;
+
+//Load Composer's autoloader
+require 'vendor/autoload.php';
+
+//Define Connection Information
+define("DB_HOST", "localhost");
+define("DB_USERNAME", "demo");
+define("DB_PASSWORD", "demo");
+define("DB_DATABASE_NAME", "demo");
+
+//Connect SQL Database
+$DB = new Database();
+```
+
+##### Without Using Constant
+```php
+
+//Import Database class into the global namespace
+//These must be at the top of your script, not inside a function
+use LaswitchTech\phpDB\Database;
+
+//Load Composer's autoloader
+require 'vendor/autoload.php';
+
+//Connect SQL Database
+$DB = new Database("localhost","demo","demo","demo");
+```
+
 #### Selecting Data
 ```php
 

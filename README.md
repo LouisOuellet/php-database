@@ -48,5 +48,8 @@ require 'vendor/autoload.php';
 $DB = new Database("localhost","demo","demo","demo");
 
 //Select Query
-$users => $DB->select("SELECT * FROM users ORDER BY id ASC LIMIT ?", ["i", 10]);
+$users = $DB->select("SELECT * FROM users ORDER BY id ASC LIMIT ?", ["i", 10]);
+
+//Output Result
+echo json_encode($users, JSON_PRETTY_PRINT);
 ```

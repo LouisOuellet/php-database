@@ -25,10 +25,46 @@ class Database {
     }
   }
 
+  public function insert($query = "" , $params = []) {
+    try {
+      $stmt = $this->executeStatement( $query , $params );
+      $last_id = $stmt->insert_id;
+      $stmt->close();
+      return $last_id;
+    } catch(Exception $e) {
+      throw New Exception( $e->getMessage() );
+    }
+    return false;
+  }
+
   public function select($query = "" , $params = []) {
     try {
       $stmt = $this->executeStatement( $query , $params );
       $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+      $stmt->close();
+      return $result;
+    } catch(Exception $e) {
+      throw New Exception( $e->getMessage() );
+    }
+    return false;
+  }
+
+  public function update($query = "" , $params = []) {
+    try {
+      $stmt = $this->executeStatement( $query , $params );
+      $result = $stmt->affected_rows;
+      $stmt->close();
+      return $result;
+    } catch(Exception $e) {
+      throw New Exception( $e->getMessage() );
+    }
+    return false;
+  }
+
+  public function delete($query = "" , $params = []) {
+    try {
+      $stmt = $this->executeStatement( $query , $params );
+      $result = $stmt->affected_rows;
       $stmt->close();
       return $result;
     } catch(Exception $e) {
@@ -44,7 +80,18 @@ class Database {
         throw New Exception("Unable to do prepared statement: " . $query);
       }
       if( $params ) {
-        $stmt->bind_param($params[0], $params[1]);
+        $types = "";
+        foreach($params as $param){
+          switch(gettype($param)){
+            case"boolean":
+            case"integer": $types .= "i"; break;
+            case"double": $types .= "d"; break;
+            case"blob": $types .= "b"; break;
+            case"string":
+            default: $types .= "s"; break;
+          }
+        }
+        $stmt->bind_param($types, ...$params);
       }
       $stmt->execute();
       return $stmt;

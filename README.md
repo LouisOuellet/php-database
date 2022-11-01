@@ -69,7 +69,27 @@ require 'vendor/autoload.php';
 $DB = new Database("localhost","demo","demo","demo");
 ```
 
-#### Selecting Data
+#### Insert Data
+```php
+
+//Import Database class into the global namespace
+//These must be at the top of your script, not inside a function
+use LaswitchTech\phpDB\Database;
+
+//Load Composer's autoloader
+require 'vendor/autoload.php';
+
+//Connect SQL Database
+$DB = new Database("localhost","demo","demo","demo");
+
+//Insert Query
+$id = $DB->insert("INSERT INTO users (username, email, status) VALUES (?,?,?)", ["user","user@domain.com",1]);
+
+//Output Result
+echo json_encode($id, JSON_PRETTY_PRINT) . PHP_EOL;
+```
+
+#### Select Data
 ```php
 
 //Import Database class into the global namespace
@@ -87,4 +107,44 @@ $users = $DB->select("SELECT * FROM users ORDER BY id ASC LIMIT ?", ["i", 10]);
 
 //Output Result
 echo json_encode($users, JSON_PRETTY_PRINT);
+```
+
+#### Update Data
+```php
+
+//Import Database class into the global namespace
+//These must be at the top of your script, not inside a function
+use LaswitchTech\phpDB\Database;
+
+//Load Composer's autoloader
+require 'vendor/autoload.php';
+
+//Connect SQL Database
+$DB = new Database("localhost","demo","demo","demo");
+
+//Update Query
+$result = $DB->update("UPDATE users SET username = ?, email = ? WHERE id = ?", ["user".$id,"user".$id."@domain.com",$id]);
+
+//Output Result
+echo json_encode($result, JSON_PRETTY_PRINT) . PHP_EOL;
+```
+
+#### Delete Data
+```php
+
+//Import Database class into the global namespace
+//These must be at the top of your script, not inside a function
+use LaswitchTech\phpDB\Database;
+
+//Load Composer's autoloader
+require 'vendor/autoload.php';
+
+//Connect SQL Database
+$DB = new Database("localhost","demo","demo","demo");
+
+//Delete Query
+$result = $DB->delete("DELETE FROM users WHERE id = ?", [$users[0]['id']]);
+
+//Output Result
+echo json_encode($result, JSON_PRETTY_PRINT) . PHP_EOL;
 ```

@@ -89,6 +89,118 @@ $id = $DB->insert("INSERT INTO users (username, email, status) VALUES (?,?,?)", 
 echo json_encode($id, JSON_PRETTY_PRINT) . PHP_EOL;
 ```
 
+#### Create a Table
+```php
+
+//Import Database class into the global namespace
+//These must be at the top of your script, not inside a function
+use LaswitchTech\phpDB\Database;
+
+//Load Composer's autoloader
+require 'vendor/autoload.php';
+
+//Connect SQL Database
+$DB = new Database("localhost","demo","demo","demo");
+
+//Create Table
+$boolean = $DB->create('users',[
+  'id' => [
+    'type' => 'BIGINT(10)',
+    'extra' => ['UNSIGNED','AUTO_INCREMENT','PRIMARY KEY']
+  ],
+  'username' => [
+    'type' => 'VARCHAR(60)',
+    'extra' => ['NOT NULL','UNIQUE']
+  ],
+  'password' => [
+    'type' => 'VARCHAR(100)',
+    'extra' => ['NOT NULL']
+  ],
+  'token' => [
+    'type' => 'VARCHAR(100)',
+    'extra' => ['NOT NULL','UNIQUE']
+  ],
+  'created' => [
+    'type' => 'DATETIME',
+    'extra' => ['DEFAULT CURRENT_TIMESTAMP']
+  ]
+]);
+
+//Output Result
+echo json_encode($boolean, JSON_PRETTY_PRINT) . PHP_EOL;
+```
+
+#### Alter a Table
+```php
+
+//Import Database class into the global namespace
+//These must be at the top of your script, not inside a function
+use LaswitchTech\phpDB\Database;
+
+//Load Composer's autoloader
+require 'vendor/autoload.php';
+
+//Connect SQL Database
+$DB = new Database("localhost","demo","demo","demo");
+
+//Alter Table
+$boolean = $DB->alter('users',[
+  'email' => [
+    'action' => 'ADD',
+    'type' => 'VARCHAR(60)',
+    'extra' => ['NOT NULL']
+  ],
+  'status' => [
+    'action' => 'ADD',
+    'type' => 'INT(1)',
+    'extra' => ['NOT NULL','DEFAULT 0']
+  ]
+]);
+
+//Output Result
+echo json_encode($boolean, JSON_PRETTY_PRINT) . PHP_EOL;
+```
+
+#### Truncate a Table
+```php
+
+//Import Database class into the global namespace
+//These must be at the top of your script, not inside a function
+use LaswitchTech\phpDB\Database;
+
+//Load Composer's autoloader
+require 'vendor/autoload.php';
+
+//Connect SQL Database
+$DB = new Database("localhost","demo","demo","demo");
+
+//Alter Table
+$boolean = $DB->truncate('users');
+
+//Output Result
+echo json_encode($boolean, JSON_PRETTY_PRINT) . PHP_EOL;
+```
+
+#### Drop a Table
+```php
+
+//Import Database class into the global namespace
+//These must be at the top of your script, not inside a function
+use LaswitchTech\phpDB\Database;
+
+//Load Composer's autoloader
+require 'vendor/autoload.php';
+
+//Connect SQL Database
+$DB = new Database("localhost","demo","demo","demo");
+
+//Alter Table
+$boolean = $DB->drop('users');
+
+//Output Result
+echo json_encode($boolean, JSON_PRETTY_PRINT) . PHP_EOL;
+```
+
 #### Select Data
 ```php
 

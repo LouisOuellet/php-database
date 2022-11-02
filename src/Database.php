@@ -5,6 +5,7 @@ namespace LaswitchTech\phpDB;
 
 //Import mysqli class into the global namespace
 use \mysqli;
+use \Exception;
 
 class Database {
 
@@ -22,6 +23,33 @@ class Database {
       }
     } catch (Exception $e) {
       throw new Exception($e->getMessage());
+    }
+  }
+
+  private function executeStatement($query = "" , $params = []) {
+    try {
+      $stmt = $this->connection->prepare( $query );
+      if($stmt === false) {
+        throw New Exception("Unable to do prepared statement: " . $query);
+      }
+      if( $params ) {
+        $types = "";
+        foreach($params as $param){
+          switch(gettype($param)){
+            case"boolean":
+            case"integer": $types .= "i"; break;
+            case"double": $types .= "d"; break;
+            case"blob": $types .= "b"; break;
+            case"string":
+            default: $types .= "s"; break;
+          }
+        }
+        $stmt->bind_param($types, ...$params);
+      }
+      $stmt->execute();
+      return $stmt;
+    } catch(Exception $e) {
+      throw New Exception( $e->getMessage() );
     }
   }
 
@@ -73,30 +101,78 @@ class Database {
     return false;
   }
 
-  private function executeStatement($query = "" , $params = []) {
+  public function create($table, $columns){
     try {
-      $stmt = $this->connection->prepare( $query );
-      if($stmt === false) {
-        throw New Exception("Unable to do prepared statement: " . $query);
-      }
-      if( $params ) {
-        $types = "";
-        foreach($params as $param){
-          switch(gettype($param)){
-            case"boolean":
-            case"integer": $types .= "i"; break;
-            case"double": $types .= "d"; break;
-            case"blob": $types .= "b"; break;
-            case"string":
-            default: $types .= "s"; break;
+      $query = 'CREATE TABLE `'.$table.'` (';
+      foreach($columns as $name => $column){
+        if(isset($column['type'])){
+          if(substr($query, -1) != '('){ $query .= ', '; }
+          $query .= '`'.$name.'` '.strtoupper($column['type']);
+          if(isset($column['extra']) && is_array($column['extra'])){
+            foreach($column['extra'] as $extra){
+              if(in_array(strtoupper($extra),['NULL','NOT NULL','UNIQUE','UNSIGNED','AUTO_INCREMENT','PRIMARY KEY']) || str_contains(strtoupper($extra), 'DEFAULT')){
+                $query .= ' '.strtoupper($extra);
+              }
+            }
           }
         }
-        $stmt->bind_param($types, ...$params);
       }
-      $stmt->execute();
-      return $stmt;
+      $query .= ' )';
+      $stmt = $this->executeStatement( $query );
+      $stmt->close();
+      return true;
     } catch(Exception $e) {
       throw New Exception( $e->getMessage() );
     }
+    return false;
+  }
+
+  public function alter($table, $columns){
+    try {
+      foreach($columns as $name => $column){
+        if(isset($column['action']) && in_array(strtoupper($column['action']),['MODIFY','ADD','DROP COLUMN'])){
+          if(isset($column['type'])){
+            $query = 'ALTER TABLE `'.$table.'` '.strtoupper($column['action']).' `'.$name.'` '.strtoupper($column['type']);
+            if(isset($column['extra']) && is_array($column['extra'])){
+              foreach($column['extra'] as $extra){
+                if(in_array(strtoupper($extra),['NULL','NOT NULL','UNIQUE','UNSIGNED','AUTO_INCREMENT','PRIMARY KEY']) || str_contains(strtoupper($extra), 'DEFAULT')){
+                  $query .= ' '.strtoupper($extra);
+                }
+              }
+            }
+            $stmt = $this->executeStatement( $query );
+            $stmt->close();
+          }
+        }
+      }
+      return true;
+    } catch(Exception $e) {
+      throw New Exception( $e->getMessage() );
+    }
+    return false;
+  }
+
+  public function drop($table){
+    try {
+      $query = 'DROP TABLE `'.$table.'`';
+      $stmt = $this->executeStatement( $query );
+      $stmt->close();
+      return true;
+    } catch(Exception $e) {
+      throw New Exception( $e->getMessage() );
+    }
+    return false;
+  }
+
+  public function truncate($table){
+    try {
+      $query = 'TRUNCATE TABLE `'.$table.'`';
+      $stmt = $this->executeStatement( $query );
+      $stmt->close();
+      return true;
+    } catch(Exception $e) {
+      throw New Exception( $e->getMessage() );
+    }
+    return false;
   }
 }

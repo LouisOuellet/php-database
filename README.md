@@ -52,7 +52,7 @@ define("DB_PASSWORD", "demo");
 define("DB_DATABASE_NAME", "demo");
 
 //Connect SQL Database
-$DB = new Database();
+$phpDB = new Database();
 ```
 
 ##### Without Using Constant
@@ -66,7 +66,7 @@ use LaswitchTech\phpDB\Database;
 require 'vendor/autoload.php';
 
 //Connect SQL Database
-$DB = new Database("localhost","demo","demo","demo");
+$phpDB = new Database("localhost","demo","demo","demo");
 ```
 
 #### Insert Data
@@ -80,10 +80,10 @@ use LaswitchTech\phpDB\Database;
 require 'vendor/autoload.php';
 
 //Connect SQL Database
-$DB = new Database("localhost","demo","demo","demo");
+$phpDB = new Database("localhost","demo","demo","demo");
 
 //Insert Query
-$id = $DB->insert("INSERT INTO users (username, email, status) VALUES (?,?,?)", ["user","user@domain.com",1]);
+$id = $phpDB->insert("INSERT INTO users (username, email, status) VALUES (?,?,?)", ["user","user@domain.com",1]);
 
 //Output Result
 echo json_encode($id, JSON_PRETTY_PRINT) . PHP_EOL;
@@ -100,10 +100,10 @@ use LaswitchTech\phpDB\Database;
 require 'vendor/autoload.php';
 
 //Connect SQL Database
-$DB = new Database("localhost","demo","demo","demo");
+$phpDB = new Database("localhost","demo","demo","demo");
 
 //Create Table
-$boolean = $DB->create('users',[
+$boolean = $phpDB->create('users',[
   'id' => [
     'type' => 'BIGINT(10)',
     'extra' => ['UNSIGNED','AUTO_INCREMENT','PRIMARY KEY']
@@ -141,10 +141,10 @@ use LaswitchTech\phpDB\Database;
 require 'vendor/autoload.php';
 
 //Connect SQL Database
-$DB = new Database("localhost","demo","demo","demo");
+$phpDB = new Database("localhost","demo","demo","demo");
 
 //Alter Table
-$boolean = $DB->alter('users',[
+$boolean = $phpDB->alter('users',[
   'email' => [
     'action' => 'ADD',
     'type' => 'VARCHAR(60)',
@@ -172,10 +172,10 @@ use LaswitchTech\phpDB\Database;
 require 'vendor/autoload.php';
 
 //Connect SQL Database
-$DB = new Database("localhost","demo","demo","demo");
+$phpDB = new Database("localhost","demo","demo","demo");
 
 //Alter Table
-$boolean = $DB->truncate('users');
+$boolean = $phpDB->truncate('users');
 
 //Output Result
 echo json_encode($boolean, JSON_PRETTY_PRINT) . PHP_EOL;
@@ -192,10 +192,10 @@ use LaswitchTech\phpDB\Database;
 require 'vendor/autoload.php';
 
 //Connect SQL Database
-$DB = new Database("localhost","demo","demo","demo");
+$phpDB = new Database("localhost","demo","demo","demo");
 
 //Alter Table
-$boolean = $DB->drop('users');
+$boolean = $phpDB->drop('users');
 
 //Output Result
 echo json_encode($boolean, JSON_PRETTY_PRINT) . PHP_EOL;
@@ -212,10 +212,10 @@ use LaswitchTech\phpDB\Database;
 require 'vendor/autoload.php';
 
 //Connect SQL Database
-$DB = new Database("localhost","demo","demo","demo");
+$phpDB = new Database("localhost","demo","demo","demo");
 
 //Select Query
-$users = $DB->select("SELECT * FROM users ORDER BY id ASC LIMIT ?", ["i", 10]);
+$users = $phpDB->select("SELECT * FROM users ORDER BY id ASC LIMIT ?", ["i", 10]);
 
 //Output Result
 echo json_encode($users, JSON_PRETTY_PRINT);
@@ -232,10 +232,10 @@ use LaswitchTech\phpDB\Database;
 require 'vendor/autoload.php';
 
 //Connect SQL Database
-$DB = new Database("localhost","demo","demo","demo");
+$phpDB = new Database("localhost","demo","demo","demo");
 
 //Update Query
-$result = $DB->update("UPDATE users SET username = ?, email = ? WHERE id = ?", ["user".$id,"user".$id."@domain.com",$id]);
+$result = $phpDB->update("UPDATE users SET username = ?, email = ? WHERE id = ?", ["user".$id,"user".$id."@domain.com",$id]);
 
 //Output Result
 echo json_encode($result, JSON_PRETTY_PRINT) . PHP_EOL;
@@ -252,10 +252,10 @@ use LaswitchTech\phpDB\Database;
 require 'vendor/autoload.php';
 
 //Connect SQL Database
-$DB = new Database("localhost","demo","demo","demo");
+$phpDB = new Database("localhost","demo","demo","demo");
 
 //Delete Query
-$result = $DB->delete("DELETE FROM users WHERE id = ?", [$users[0]['id']]);
+$result = $phpDB->delete("DELETE FROM users WHERE id = ?", [$users[0]['id']]);
 
 //Output Result
 echo json_encode($result, JSON_PRETTY_PRINT) . PHP_EOL;

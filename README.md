@@ -51,6 +51,9 @@ define("DB_USERNAME", "demo");
 define("DB_PASSWORD", "demo");
 define("DB_DATABASE_NAME", "demo");
 
+//Optionally Output Debug Information
+define("DB_DEBUG", true);
+
 //Connect SQL Database
 $phpDB = new Database();
 ```
@@ -67,26 +70,6 @@ require 'vendor/autoload.php';
 
 //Connect SQL Database
 $phpDB = new Database("localhost","demo","demo","demo");
-```
-
-#### Insert Data
-```php
-
-//Import Database class into the global namespace
-//These must be at the top of your script, not inside a function
-use LaswitchTech\phpDB\Database;
-
-//Load Composer's autoloader
-require 'vendor/autoload.php';
-
-//Connect SQL Database
-$phpDB = new Database("localhost","demo","demo","demo");
-
-//Insert Query
-$id = $phpDB->insert("INSERT INTO users (username, email, status) VALUES (?,?,?)", ["user","user@domain.com",1]);
-
-//Output Result
-echo json_encode($id, JSON_PRETTY_PRINT) . PHP_EOL;
 ```
 
 #### Create a Table
@@ -199,6 +182,26 @@ $boolean = $phpDB->drop('users');
 
 //Output Result
 echo json_encode($boolean, JSON_PRETTY_PRINT) . PHP_EOL;
+```
+
+#### Insert Data
+```php
+
+//Import Database class into the global namespace
+//These must be at the top of your script, not inside a function
+use LaswitchTech\phpDB\Database;
+
+//Load Composer's autoloader
+require 'vendor/autoload.php';
+
+//Connect SQL Database
+$phpDB = new Database("localhost","demo","demo","demo");
+
+//Insert Query
+$id = $phpDB->insert("INSERT INTO users (username, email, status) VALUES (?,?,?)", ["user","user@domain.com",1]);
+
+//Output Result
+echo json_encode($id, JSON_PRETTY_PRINT) . PHP_EOL;
 ```
 
 #### Select Data

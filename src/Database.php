@@ -10,12 +10,15 @@ use \Exception;
 class Database {
 
   protected $connection = null;
+  protected $debug = false;
 
-  public function __construct($host = null, $username = null, $password = null, $database = null) {
+  public function __construct($host = null, $username = null, $password = null, $database = null, $debug = null) {
     if($host == null && defined('DB_HOST')){ $host = DB_HOST; }
     if($username == null && defined('DB_USERNAME')){ $username = DB_USERNAME; }
     if($password == null && defined('DB_PASSWORD')){ $password = DB_PASSWORD; }
     if($database == null && defined('DB_DATABASE_NAME')){ $database = DB_DATABASE_NAME; }
+    if($debug == null && defined('DB_DEBUG')){ $debug = DB_DEBUG; }
+    if(is_bool($debug)){ $this->debug = $debug; }
     try {
       $this->connection = new mysqli($host, $username, $password, $database);
       if ( mysqli_connect_errno()) {
@@ -27,8 +30,11 @@ class Database {
   }
 
   private function executeStatement($query = "" , $params = []) {
+    if($this->debug){ echo 'Query: ' . json_encode($query, JSON_PRETTY_PRINT) . PHP_EOL . '<br>'; }
+    if($this->debug){ echo 'Params: ' . json_encode($params, JSON_PRETTY_PRINT) . PHP_EOL . '<br>'; }
     try {
       $stmt = $this->connection->prepare( $query );
+      if($this->debug){ echo 'Prepared Statement: ' . json_encode($stmt, JSON_PRETTY_PRINT) . PHP_EOL . '<br>'; }
       if($stmt === false) {
         throw New Exception("Unable to do prepared statement: " . $query);
       }
@@ -44,9 +50,11 @@ class Database {
             default: $types .= "s"; break;
           }
         }
+        if($this->debug){ echo 'Bind Parameters: ' . json_encode($types, JSON_PRETTY_PRINT) . PHP_EOL . '<br>'; }
         $stmt->bind_param($types, ...$params);
       }
       $stmt->execute();
+      if($this->debug){ echo 'Executed Statement: ' . json_encode($stmt, JSON_PRETTY_PRINT) . PHP_EOL . '<br>'; }
       return $stmt;
     } catch(Exception $e) {
       throw New Exception( $e->getMessage() );

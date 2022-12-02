@@ -29,6 +29,10 @@ class Database {
     }
   }
 
+  public function __call($name, $arguments) {
+    return [ "error" => "[".$name."] 501 Not Implemented" ];
+  }
+
   private function executeStatement($query = "" , $params = []) {
     if($this->debug){ echo 'Query: ' . json_encode($query, JSON_PRETTY_PRINT) . PHP_EOL . '<br>'; }
     if($this->debug){ echo 'Params: ' . json_encode($params, JSON_PRETTY_PRINT) . PHP_EOL . '<br>'; }

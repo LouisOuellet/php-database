@@ -20,13 +20,17 @@ class Database {
     if($debug == null && defined('DB_DEBUG')){ $debug = DB_DEBUG; }
     if(is_bool($debug)){ $this->debug = $debug; }
     try {
+      error_reporting(E_ALL ^ E_WARNING);
       $this->connection = new mysqli($host, $username, $password, $database);
       if(mysqli_connect_errno()){
-        $this->connection = null;
         throw new Exception("Could not connect to database.");
       }
+      error_reporting(E_ALL);
     } catch (Exception $e) {
-      throw new Exception($e->getMessage());
+      $this->connection = null;
+      if($this->Debug){
+        throw new Exception($e->getMessage());
+      }
     }
   }
 

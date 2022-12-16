@@ -22,13 +22,11 @@ class Database {
     try {
       $this->connection = new mysqli($host, $username, $password, $database);
       if(mysqli_connect_errno()){
+        $this->connection = null;
         throw new Exception("Could not connect to database.");
       }
     } catch (Exception $e) {
-      $this->connection = null;
-      if($this->debug){
-        throw new Exception($e->getMessage());
-      }
+      throw new Exception($e->getMessage());
     }
   }
 

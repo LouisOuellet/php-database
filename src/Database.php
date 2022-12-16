@@ -21,12 +21,19 @@ class Database {
     if(is_bool($debug)){ $this->debug = $debug; }
     try {
       $this->connection = new mysqli($host, $username, $password, $database);
-      if ( mysqli_connect_errno()) {
+      if(mysqli_connect_errno()){
         throw new Exception("Could not connect to database.");
       }
     } catch (Exception $e) {
-      throw new Exception($e->getMessage());
+      $this->connection = null;
+      if($this->debug){
+        throw new Exception($e->getMessage());
+      }
     }
+  }
+
+  public function isConnected(){
+    return ($this->connection != null);
   }
 
   public function __call($name, $arguments) {

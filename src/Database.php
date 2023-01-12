@@ -138,7 +138,7 @@ class Database {
               }
             }
           }
-          $query .= ' CHARACTER SET ' . $this->character . ' COLLATE ' . $this->collate;
+          // $query .= ' CHARACTER SET ' . $this->character . ' COLLATE ' . $this->collate;
         }
       }
       $query .= ' ) CHARACTER SET ' . $this->character;
@@ -157,7 +157,7 @@ class Database {
         if(isset($column['action']) && in_array(strtoupper($column['action']),['MODIFY','ADD','DROP COLUMN'])){
           if(isset($column['type'])){
             $query = 'ALTER TABLE `'.$table.'` DEFAULT CHARACTER SET ' . $this->character . ', '.strtoupper($column['action']).' `'.$name.'` '.strtoupper($column['type']);
-            $query .= ' CHARACTER SET ' . $this->character . ' COLLATE ' . $this->collate;
+            // $query .= ' CHARACTER SET ' . $this->character . ' COLLATE ' . $this->collate;
             if(isset($column['extra']) && is_array($column['extra'])){
               foreach($column['extra'] as $extra){
                 if(in_array(strtoupper($extra),['NULL','NOT NULL','UNIQUE','UNSIGNED','AUTO_INCREMENT','PRIMARY KEY']) || str_contains(strtoupper($extra), 'DEFAULT')){

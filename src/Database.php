@@ -76,6 +76,18 @@ class Database {
     }
   }
 
+  public function query($query){
+    try {
+      $stmt = $this->executeStatement( $query );
+      $result = $stmt->get_result();
+      $stmt->close();
+      return $result;
+    } catch(Exception $e) {
+      throw New Exception( $e->getMessage() );
+    }
+    return false;
+  }
+
   public function insert($query = "" , $params = []) {
     try {
       $stmt = $this->executeStatement( $query , $params );

@@ -11,6 +11,8 @@ class Database {
 
   protected $connection = null;
   protected $debug = false;
+  protected $character = 'utf8mb4';
+  protected $collate = 'utf8mb4_bin';
 
   public function __construct($host = null, $username = null, $password = null, $database = null, $debug = null) {
     if($host == null && defined('DB_HOST')){ $host = DB_HOST; }
@@ -136,9 +138,10 @@ class Database {
               }
             }
           }
+          $query .= ' CHARACTER SET ' . $this->character . ' COLLATE ' . $this->collate;
         }
       }
-      $query .= ' )';
+      $query .= ' ) CHARACTER SET ' . $this->character;
       $stmt = $this->executeStatement( $query );
       $stmt->close();
       return true;
@@ -153,7 +156,8 @@ class Database {
       foreach($columns as $name => $column){
         if(isset($column['action']) && in_array(strtoupper($column['action']),['MODIFY','ADD','DROP COLUMN'])){
           if(isset($column['type'])){
-            $query = 'ALTER TABLE `'.$table.'` '.strtoupper($column['action']).' `'.$name.'` '.strtoupper($column['type']);
+            $query = 'ALTER TABLE `'.$table.'` DEFAULT CHARACTER SET ' . $this->character . ', '.strtoupper($column['action']).' `'.$name.'` '.strtoupper($column['type']);
+            $query .= ' CHARACTER SET ' . $this->character . ' COLLATE ' . $this->collate;
             if(isset($column['extra']) && is_array($column['extra'])){
               foreach($column['extra'] as $extra){
                 if(in_array(strtoupper($extra),['NULL','NOT NULL','UNIQUE','UNSIGNED','AUTO_INCREMENT','PRIMARY KEY']) || str_contains(strtoupper($extra), 'DEFAULT')){

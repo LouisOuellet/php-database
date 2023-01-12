@@ -79,7 +79,7 @@ class Database {
   public function query($query){
     try {
       $stmt = $this->executeStatement( $query );
-      $result = $stmt->get_result();
+      $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
       $stmt->close();
       return $result;
     } catch(Exception $e) {

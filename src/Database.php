@@ -12,7 +12,7 @@ class Database {
   protected $connection = null;
   protected $debug = false;
   protected $character = 'utf8mb4';
-  protected $collate = 'utf8mb4_bin';
+  protected $collate = 'utf8mb4_general_ci';
 
   public function __construct($host = null, $username = null, $password = null, $database = null, $debug = null) {
     if($host == null && defined('DB_HOST')){ $host = DB_HOST; }
@@ -76,9 +76,12 @@ class Database {
     }
   }
 
-  public function query($query){
+  public function query($query, $params = []){
     try {
-      $stmt = $this->executeStatement( $query );
+      foreach($params as $key => $value){
+        if(is_string($value)){ $params[$key] = mb_convert_encoding($value, 'UTF-8', mb_detect_encoding($value)); }
+      }
+      $stmt = $this->executeStatement( $query, $params );
       $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
       $stmt->close();
       return $result;
@@ -90,6 +93,9 @@ class Database {
 
   public function insert($query = "" , $params = []) {
     try {
+      foreach($params as $key => $value){
+        if(is_string($value)){ $params[$key] = mb_convert_encoding($value, 'UTF-8', mb_detect_encoding($value)); }
+      }
       $stmt = $this->executeStatement( $query , $params );
       $last_id = $stmt->insert_id;
       $stmt->close();
@@ -102,6 +108,9 @@ class Database {
 
   public function select($query = "" , $params = []) {
     try {
+      foreach($params as $key => $value){
+        if(is_string($value)){ $params[$key] = mb_convert_encoding($value, 'UTF-8', mb_detect_encoding($value)); }
+      }
       $stmt = $this->executeStatement( $query , $params );
       $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
       $stmt->close();
@@ -114,6 +123,9 @@ class Database {
 
   public function update($query = "" , $params = []) {
     try {
+      foreach($params as $key => $value){
+        if(is_string($value)){ $params[$key] = mb_convert_encoding($value, 'UTF-8', mb_detect_encoding($value)); }
+      }
       $stmt = $this->executeStatement( $query , $params );
       $result = $stmt->affected_rows;
       $stmt->close();
@@ -126,6 +138,9 @@ class Database {
 
   public function delete($query = "" , $params = []) {
     try {
+      foreach($params as $key => $value){
+        if(is_string($value)){ $params[$key] = mb_convert_encoding($value, 'UTF-8', mb_detect_encoding($value)); }
+      }
       $stmt = $this->executeStatement( $query , $params );
       $result = $stmt->affected_rows;
       $stmt->close();
@@ -150,7 +165,6 @@ class Database {
               }
             }
           }
-          // $query .= ' CHARACTER SET ' . $this->character . ' COLLATE ' . $this->collate;
         }
       }
       $query .= ' ) CHARACTER SET ' . $this->character;
@@ -169,7 +183,6 @@ class Database {
         if(isset($column['action']) && in_array(strtoupper($column['action']),['MODIFY','ADD','DROP COLUMN'])){
           if(isset($column['type'])){
             $query = 'ALTER TABLE `'.$table.'` DEFAULT CHARACTER SET ' . $this->character . ', '.strtoupper($column['action']).' `'.$name.'` '.strtoupper($column['type']);
-            // $query .= ' CHARACTER SET ' . $this->character . ' COLLATE ' . $this->collate;
             if(isset($column['extra']) && is_array($column['extra'])){
               foreach($column['extra'] as $extra){
                 if(in_array(strtoupper($extra),['NULL','NOT NULL','UNIQUE','UNSIGNED','AUTO_INCREMENT','PRIMARY KEY']) || str_contains(strtoupper($extra), 'DEFAULT')){

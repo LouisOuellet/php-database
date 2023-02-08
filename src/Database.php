@@ -47,6 +47,13 @@ class Database {
   private function executeStatement($query = "" , $params = []) {
     if($this->debug){ echo 'Query: ' . json_encode($query, JSON_PRETTY_PRINT) . PHP_EOL . '<br>'; }
     if($this->debug){ echo 'Params: ' . json_encode($params, JSON_PRETTY_PRINT) . PHP_EOL . '<br>'; }
+    foreach($params as $key => $value){
+      if(is_string($value)){
+        if($encoding = mb_detect_encoding($value)){
+          $params[$key] = mb_convert_encoding($value, 'UTF-8', $encoding);
+        }
+      }
+    }
     try {
       $stmt = $this->connection->prepare( $query );
       if($this->debug){ echo 'Prepared Statement: ' . json_encode($stmt, JSON_PRETTY_PRINT) . PHP_EOL . '<br>'; }
@@ -78,9 +85,6 @@ class Database {
 
   public function query($query, $params = []){
     try {
-      foreach($params as $key => $value){
-        if(is_string($value)){ $params[$key] = mb_convert_encoding($value, 'UTF-8', mb_detect_encoding($value)); }
-      }
       $stmt = $this->executeStatement( $query, $params );
       $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
       $stmt->close();
@@ -93,9 +97,6 @@ class Database {
 
   public function insert($query = "" , $params = []) {
     try {
-      foreach($params as $key => $value){
-        if(is_string($value)){ $params[$key] = mb_convert_encoding($value, 'UTF-8', mb_detect_encoding($value)); }
-      }
       $stmt = $this->executeStatement( $query , $params );
       $last_id = $stmt->insert_id;
       $stmt->close();
@@ -108,9 +109,6 @@ class Database {
 
   public function select($query = "" , $params = []) {
     try {
-      foreach($params as $key => $value){
-        if(is_string($value)){ $params[$key] = mb_convert_encoding($value, 'UTF-8', mb_detect_encoding($value)); }
-      }
       $stmt = $this->executeStatement( $query , $params );
       $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
       $stmt->close();
@@ -123,9 +121,6 @@ class Database {
 
   public function update($query = "" , $params = []) {
     try {
-      foreach($params as $key => $value){
-        if(is_string($value)){ $params[$key] = mb_convert_encoding($value, 'UTF-8', mb_detect_encoding($value)); }
-      }
       $stmt = $this->executeStatement( $query , $params );
       $result = $stmt->affected_rows;
       $stmt->close();
@@ -138,9 +133,6 @@ class Database {
 
   public function delete($query = "" , $params = []) {
     try {
-      foreach($params as $key => $value){
-        if(is_string($value)){ $params[$key] = mb_convert_encoding($value, 'UTF-8', mb_detect_encoding($value)); }
-      }
       $stmt = $this->executeStatement( $query , $params );
       $result = $stmt->affected_rows;
       $stmt->close();

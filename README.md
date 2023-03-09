@@ -6,11 +6,23 @@
 ![GitHub top language](https://img.shields.io/github/languages/top/LouisOuellet/php-database?style=for-the-badge)
 ![Version](https://img.shields.io/github/v/release/LouisOuellet/php-database?label=Version&style=for-the-badge)
 
-## Features
- - SQL Database Handling
+## Description
+This is a PHP class that provides an interface for interacting with a MySQL database using the mysqli extension. It provides methods for creating, reading, updating, and deleting data from a database, as well as for creating and modifying database tables. It also includes methods for transaction handling and error logging.
 
-## Why you might need it
-If you are looking for an easy way to start using SQL. This PHP Class is for you.
+The class uses prepared statements to prevent SQL injection attacks and supports UTF-8 encoding. It also includes debugging functionality that allows you to log queries and parameters to a file.
+
+## Features
+ - Connection pooling for improved performance
+ - Automatic database schema migration
+ - Query builder for easier construction of complex SQL queries
+ - Support for transactions and rollbacks
+ - Query profiling and optimization
+ - Easy and secure interaction with a SQL database
+ - Debugging functionality
+ - Simplified handling of common SQL tasks
+
+## Why you might need it?
+phpDB is a simple and easy-to-use PHP class that provides an interface for interacting with a MySQL database using the mysqli extension. If you're building a web application or website that needs to store and retrieve data from a MySQL database, then phpDB can save you a lot of time and effort. The class provides methods for creating, reading, updating, and deleting data from a database, as well as for creating and modifying database tables. It uses prepared statements to prevent SQL injection attacks and supports UTF-8 encoding, which ensures that your data is stored and retrieved accurately. Additionally, phpDB includes debugging functionality that allows you to log queries and parameters to a file, making it easier to troubleshoot issues with your database. Whether you're a beginner or an experienced developer, phpDB can simplify your database interactions and help you get your web application up and running quickly.
 
 ## Can I use this?
 Sure!

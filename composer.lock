@@ -4,8 +4,46 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9e0537b9eaa563916653408a2eb12a88",
-    "packages": [],
+    "content-hash": "80573604712ddeb0f85923237c7b03b7",
+    "packages": [
+        {
+            "name": "laswitchtech/php-logger",
+            "version": "v1.0.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/LouisOuellet/php-logger.git",
+                "reference": "e06fb11681cb5443cea92f10332d0ee4560fb88e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/LouisOuellet/php-logger/zipball/e06fb11681cb5443cea92f10332d0ee4560fb88e",
+                "reference": "e06fb11681cb5443cea92f10332d0ee4560fb88e",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "LaswitchTech\\phpLogger\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0-only"
+            ],
+            "authors": [
+                {
+                    "name": "Louis Ouellet",
+                    "email": "louis_ouellet@hotmail.com"
+                }
+            ],
+            "description": "Easy to use logging library for PHP",
+            "support": {
+                "issues": "https://github.com/LouisOuellet/php-logger/issues",
+                "source": "https://github.com/LouisOuellet/php-logger/tree/v1.0.5"
+            },
+            "time": "2023-03-09T16:06:54+00:00"
+        }
+    ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",

@@ -8,6 +8,8 @@ use LaswitchTech\phpLogger\phpLogger;
 
 //Import mysqli class into the global namespace
 use \mysqli;
+
+//Import Exception class into the global namespace
 use \Exception;
 
 class Database {

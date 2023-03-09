@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "laswitchtech/php-logger",
-            "version": "v1.0.7",
+            "version": "v1.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/LouisOuellet/php-logger.git",
-                "reference": "0b51d5a82ac8b6f638a987adc8ca466de6964b86"
+                "reference": "9505c33c45beff4445b1e37023023d19d5b87cc5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/LouisOuellet/php-logger/zipball/0b51d5a82ac8b6f638a987adc8ca466de6964b86",
-                "reference": "0b51d5a82ac8b6f638a987adc8ca466de6964b86",
+                "url": "https://api.github.com/repos/LouisOuellet/php-logger/zipball/9505c33c45beff4445b1e37023023d19d5b87cc5",
+                "reference": "9505c33c45beff4445b1e37023023d19d5b87cc5",
                 "shasum": ""
             },
             "type": "library",
@@ -39,9 +39,9 @@
             "description": "Easy to use logging library for PHP",
             "support": {
                 "issues": "https://github.com/LouisOuellet/php-logger/issues",
-                "source": "https://github.com/LouisOuellet/php-logger/tree/v1.0.7"
+                "source": "https://github.com/LouisOuellet/php-logger/tree/v1.0.8"
             },
-            "time": "2023-03-09T17:01:18+00:00"
+            "time": "2023-03-09T17:41:53+00:00"
         }
     ],
     "packages-dev": [],

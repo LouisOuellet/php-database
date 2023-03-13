@@ -37,6 +37,10 @@ class Database {
     // Initiate phpLogger
     $this->Logger = new phpLogger(['database' => 'log/database.log']);
 
+    // Configure phpLogger
+    $this->Logger->config('ip',true);
+    $this->Logger->config('rotation',false);
+
     // Set default parameter values if not specified
     if($host == null && defined('DB_HOST')){ $host = DB_HOST; }
     if($username == null && defined('DB_USERNAME')){ $username = DB_USERNAME; }

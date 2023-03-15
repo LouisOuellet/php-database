@@ -15,7 +15,7 @@ use \Exception;
 class Database {
 
   private $connection = null;
-  private $debug = false;
+  private $debug = 1;
   private $character = 'utf8mb4';
   private $collate = 'utf8mb4_general_ci';
 
@@ -34,20 +34,21 @@ class Database {
    */
   public function __construct($host = null, $username = null, $password = null, $database = null, $debug = null) {
 
-    // Initiate phpLogger
-    $this->Logger = new phpLogger(['database' => 'log/database.log']);
-
-    // Configure phpLogger
-    $this->Logger->config('ip',true);
-    $this->Logger->config('rotation',false);
-
     // Set default parameter values if not specified
     if($host == null && defined('DB_HOST')){ $host = DB_HOST; }
     if($username == null && defined('DB_USERNAME')){ $username = DB_USERNAME; }
     if($password == null && defined('DB_PASSWORD')){ $password = DB_PASSWORD; }
     if($database == null && defined('DB_DATABASE_NAME')){ $database = DB_DATABASE_NAME; }
     if($debug == null && defined('DB_DEBUG')){ $debug = DB_DEBUG; }
-    if(is_bool($debug)){ $this->debug = $debug; }
+    if(is_int($debug)){ $this->debug = $debug; }
+
+    // Initiate phpLogger
+    $this->Logger = new phpLogger(['database' => 'log/database.log']);
+
+    // Configure phpLogger
+    $this->Logger->config('ip',true);
+    $this->Logger->config('rotation',false);
+    $this->Logger->config('level',$this->debug);
 
     // Attempt a connection to the database
     try {
@@ -57,12 +58,10 @@ class Database {
 
       // Create a new mysqli connection
       $this->Logger->info("Establishing connection to database.");
-      if($this->debug){
-        $this->Logger->debug("Host: " . $host);
-        $this->Logger->debug("Username: " . $username);
-        $this->Logger->debug("Password: " . $password);
-        $this->Logger->debug("Database: " . $database);
-      }
+      $this->Logger->debug("Host: " . $host);
+      $this->Logger->debug("Username: " . $username);
+      $this->Logger->debug("Password: " . $password);
+      $this->Logger->debug("Database: " . $database);
       $this->connection = new mysqli($host, $username, $password, $database);
 
       // Throw an exception if connection failed
@@ -77,12 +76,9 @@ class Database {
       error_reporting(E_ALL);
     } catch (Exception $e) {
       $this->connection = null;
-      if($this->debug){
 
-        // Log any errors and throw an exception
-        $this->Logger->error($e->getMessage());
-        throw new Exception($e->getMessage());
-      }
+      // Log any errors and throw an exception
+      $this->Logger->error($e->getMessage());
     }
   }
 
@@ -166,14 +162,10 @@ class Database {
   private function execute($query = "" , $params = []) {
 
     // If debug mode is enabled, print the query and parameters
-    if($this->debug){
-      $this->Logger->debug('Query: ');
-      $this->Logger->debug($query);
-    }
-    if($this->debug){
-      $this->Logger->debug('Params: ');
-      $this->Logger->debug($params);
-    }
+    $this->Logger->debug('Query: ');
+    $this->Logger->debug($query);
+    $this->Logger->debug('Params: ');
+    $this->Logger->debug($params);
 
     // Convert any parameters to UTF-8 encoding
     foreach($params as $key => $value){
@@ -187,10 +179,8 @@ class Database {
     try {
       // Prepare the statement using the provided query
       $stmt = $this->connection->prepare($query);
-      if($this->debug){
-        $this->Logger->debug('Prepared Statement: ');
-        $this->Logger->debug($stmt);
-      }
+      $this->Logger->debug('Prepared Statement: ');
+      $this->Logger->debug($stmt);
 
       // Throw an exception if the statement cannot be prepared
       if($stmt === false) {
@@ -211,19 +201,15 @@ class Database {
             default: $types .= "s"; break;
           }
         }
-        if($this->debug){
-          $this->Logger->debug('Bind Parameters: ');
-          $this->Logger->debug($types);
-        }
+        $this->Logger->debug('Bind Parameters: ');
+        $this->Logger->debug($types);
         $stmt->bind_param($types, ...$params);
       }
 
       // Execute the statement
       $stmt->execute();
-      if($this->debug){
-        $this->Logger->debug('Executed Statement: ');
-        $this->Logger->debug($stmt);
-      }
+      $this->Logger->debug('Executed Statement: ');
+      $this->Logger->debug($stmt);
       return $stmt;
     } catch(Exception $e) {
 

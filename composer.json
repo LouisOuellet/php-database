@@ -12,7 +12,8 @@
     "minimum-stability": "stable",
     "require": {
         "php": "*",
-        "laswitchtech/php-logger": "^1.0"
+        "laswitchtech/php-logger": "^1.0",
+        "laswitchtech/php-net": "^1.0"
     },
     "autoload": {
         "psr-4": {

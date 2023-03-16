@@ -6,6 +6,9 @@ namespace LaswitchTech\phpDB;
 //Import phpLogger class into the global namespace
 use LaswitchTech\phpLogger\phpLogger;
 
+//Import phpNet class into the global namespace
+use LaswitchTech\phpNet\phpNet;
+
 //Import mysqli class into the global namespace
 use \mysqli;
 
@@ -15,11 +18,15 @@ use \Exception;
 class Database {
 
   private $connection = null;
-  private $debug = 1;
   private $character = 'utf8mb4';
   private $collate = 'utf8mb4_general_ci';
 
-  private $Logger;
+	// Logger
+	private $Logger;
+	private $Level = 1;
+
+	// NetTools
+	private $NetTools;
 
   /**
    * Create a new Database instance.
@@ -28,19 +35,21 @@ class Database {
    * @param  string|null  $username
    * @param  string|null  $password
    * @param  string|null  $database
-   * @param  boolean|null  $debug
    * @return void
    * @throws Exception
    */
-  public function __construct($host = null, $username = null, $password = null, $database = null, $debug = null) {
+  public function __construct($host = null, $username = null, $password = null, $database = null) {
+
+    // Initialize $Level
+    $Level = $this->Level;
 
     // Set default parameter values if not specified
     if($host == null && defined('DB_HOST')){ $host = DB_HOST; }
     if($username == null && defined('DB_USERNAME')){ $username = DB_USERNAME; }
     if($password == null && defined('DB_PASSWORD')){ $password = DB_PASSWORD; }
-    if($database == null && defined('DB_DATABASE_NAME')){ $database = DB_DATABASE_NAME; }
-    if($debug == null && defined('DB_DEBUG')){ $debug = DB_DEBUG; }
-    if(is_int($debug)){ $this->debug = $debug; }
+    if($database == null && defined('DB_DATABASE')){ $database = DB_DATABASE; }
+    if($Level == null && defined('DB_DEBUG')){ $Level = DB_DEBUG; }
+    if(is_int($Level)){ $this->Level = $Level; }
 
     // Initiate phpLogger
     $this->Logger = new phpLogger(['database' => 'log/database.log']);
@@ -48,26 +57,101 @@ class Database {
     // Configure phpLogger
     $this->Logger->config('ip',true);
     $this->Logger->config('rotation',false);
-    $this->Logger->config('level',$this->debug);
+    $this->Logger->config('level',$this->Level);
+
+    // Initiate phpNet
+    $this->NetTools = new phpNet();
+
+    // Configure phpNet
+    $this->NetTools->config('level',$this->Level);
+
+    // Attempt a connection to the database
+    if($host !== null && $username !== null && $password !== null && $database !== null){
+      $this->connect($host,$username,$password,$database);
+    }
+  }
+
+  /**
+   * Configure Library.
+   *
+   * @param  string  $option
+   * @param  bool|int  $value
+   * @return void
+   * @throws Exception
+   */
+  public function config($option, $value){
+		try {
+			if(is_string($option)){
+	      switch($option){
+	        case"level":
+	          if(is_int($value)){
+
+							// Logging Level
+	            $this->Level = $value;
+
+							// Configure phpLogger
+					    $this->Logger->config('level',$this->Level);
+
+							// Configure phpNet
+              $this->NetTools->config('level',$this->Level);
+	          } else{
+	            throw new Exception("2nd argument must be an integer.");
+	          }
+	          break;
+	        default:
+	          throw new Exception("unable to configure $option.");
+	          break;
+	      }
+	    } else{
+	      throw new Exception("1st argument must be as string.");
+	    }
+		} catch (Exception $e) {
+			$this->Logger->error('Error: '.$e->getMessage());
+		}
+  }
+
+  /**
+   * Connect Database.
+   *
+   * @param  string|null  $host
+   * @param  string|null  $username
+   * @param  string|null  $password
+   * @param  string|null  $database
+   * @return void
+   * @throws Exception
+   */
+  public function connect($host, $username, $password, $database) {
 
     // Attempt a connection to the database
     try {
 
-      // Turn off warnings
-      error_reporting(E_ALL ^ E_WARNING);
-
-      // Create a new mysqli connection
+      // Debug Information
       $this->Logger->info("Establishing connection to database.");
       $this->Logger->debug("Host: " . $host);
       $this->Logger->debug("Username: " . $username);
       $this->Logger->debug("Password: " . $password);
       $this->Logger->debug("Database: " . $database);
+
+      // Checking for an active connection
+      if(!$this->isConnected()){
+        throw new Exception("Database already connected.");
+      }
+
+      // Checking for an open port
+      if(!$this->NetTools->scan($host,3306)){
+        throw new Exception("SQL port on {$host} is closed or blocked.");
+      }
+
+      // Create a new mysqli connection
       $this->connection = new mysqli($host, $username, $password, $database);
+
+      // Turn off warnings
+      error_reporting(E_ALL ^ E_WARNING);
 
       // Throw an exception if connection failed
       if(mysqli_connect_errno()){
         $this->Logger->error("Could not connect to database.");
-        throw new Exception("Could not connect to database.");
+        throw new Exception(mysqli_connect_errno());
       } else {
         $this->Logger->success("Database connected.");
       }
@@ -75,26 +159,13 @@ class Database {
       // Turn on warnings
       error_reporting(E_ALL);
     } catch (Exception $e) {
+
+      // Clear connection
       $this->connection = null;
 
       // Log any errors and throw an exception
       $this->Logger->error($e->getMessage());
     }
-  }
-
-  /**
-   * Error handling.
-   *
-   * @param  string  $method
-   * @param  string|array|null  $arguments
-   * @return Exception
-   * @throws Exception
-   */
-  public function __call($method, $arguments) {
-
-    // Log any errors and throw an exception
-    $this->Logger->error("Method $method does not exist.");
-    throw new Exception("Method $method does not exist.");
   }
 
   /**

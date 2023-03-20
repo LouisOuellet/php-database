@@ -108,6 +108,8 @@ class Database {
 		} catch (Exception $e) {
 			$this->Logger->error('Error: '.$e->getMessage());
 		}
+
+    return $this;
   }
 
   /**
@@ -133,7 +135,7 @@ class Database {
       $this->Logger->debug("Database: " . $database);
 
       // Checking for an active connection
-      if(!$this->isConnected()){
+      if($this->isConnected()){
         throw new Exception("Database already connected.");
       }
 
@@ -248,6 +250,12 @@ class Database {
     }
 
     try {
+
+      // Check if Database is connected
+      if(!$this->isConnected()){
+        throw New Exception("Database is not connected.");
+      }
+
       // Prepare the statement using the provided query
       $stmt = $this->connection->prepare($query);
       $this->Logger->debug('Prepared Statement: ');

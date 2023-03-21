@@ -311,7 +311,8 @@ class Database {
       // Execute the query and retrieve the result set as an associative array
       $stmt = $this->execute( $query, $params );
       $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-      $stmt->close();
+
+      // Return result
       return $result;
     } catch(Exception $e) {
 
@@ -335,7 +336,8 @@ class Database {
       // Execute the INSERT query and retrieve the ID of the last inserted row
       $stmt = $this->execute( $query , $params );
       $last_id = $stmt->insert_id;
-      $stmt->close();
+
+      // Return last_id
       return $last_id;
     } catch(Exception $e) {
 
@@ -359,7 +361,8 @@ class Database {
       // Execute the SELECT query and retrieve the result set as an associative array
       $stmt = $this->execute( $query , $params );
       $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-      $stmt->close();
+
+      // Return result
       return $result;
     } catch(Exception $e) {
 
@@ -383,7 +386,8 @@ class Database {
       // Execute the UPDATE query and retrieve the number of affected rows
       $stmt = $this->execute( $query , $params );
       $result = $stmt->affected_rows;
-      $stmt->close();
+
+      // Return result
       return $result;
     } catch(Exception $e) {
 
@@ -407,7 +411,8 @@ class Database {
       // Execute the DELETE query and retrieve the number of affected rows
       $stmt = $this->execute( $query , $params );
       $result = $stmt->affected_rows;
-      $stmt->close();
+
+      // Return result
       return $result;
     } catch(Exception $e) {
 
@@ -428,6 +433,13 @@ class Database {
    */
   public function create($table, $columns){
     try {
+
+      // Check if table exist
+      if($this->getTable($table)){
+        throw New Exception("This table already exist");
+      }
+
+      // Start building Query
       $query = 'CREATE TABLE `'.$table.'` (';
 
       // Loop through each column and add it to the query
@@ -456,13 +468,18 @@ class Database {
 
       // Execute the query
       $stmt = $this->execute( $query );
-      $stmt->close();
+
+      // Return boolean
       return true;
     } catch(Exception $e) {
 
-      // Log any errors and throw an exception
+      // Log any errors
       $this->Logger->error($e->getMessage());
-      throw New Exception( $e->getMessage() );
+
+      // Throw an exception if level is higher than 5
+      if($this->Level > 5){
+        throw New Exception( $e->getMessage() );
+      }
     }
     return false;
   }
@@ -477,6 +494,11 @@ class Database {
    */
   public function alter($table, $columns){
     try {
+
+      // Check if table exist
+      if(!$this->getTable($table)){
+        throw New Exception("This table does not exist");
+      }
 
       // Loop through each column and add it to the query
       foreach($columns as $name => $column){
@@ -497,16 +519,19 @@ class Database {
 
             // Execute the query
             $stmt = $this->execute( $query );
-            $stmt->close();
           }
         }
       }
       return true;
     } catch(Exception $e) {
 
-      // Log any errors and throw an exception
+      // Log any errors
       $this->Logger->error($e->getMessage());
-      throw New Exception( $e->getMessage() );
+
+      // Throw an exception if level is higher than 5
+      if($this->Level > 5){
+        throw New Exception( $e->getMessage() );
+      }
     }
     return false;
   }
@@ -521,18 +546,28 @@ class Database {
   public function drop($table){
     try {
 
+      // Check if table exist
+      if(!$this->getTable($table)){
+        throw New Exception("This table does not exist");
+      }
+
       // Generate the SQL query to drop the table
       $query = 'DROP TABLE `'.$table.'`';
 
       // Execute the query
       $stmt = $this->execute( $query );
-      $stmt->close();
+
+      // Return boolean
       return true;
     } catch(Exception $e) {
 
-      // Log any errors and throw an exception
+      // Log any errors
       $this->Logger->error($e->getMessage());
-      throw New Exception( $e->getMessage() );
+
+      // Throw an exception if level is higher than 5
+      if($this->Level > 5){
+        throw New Exception( $e->getMessage() );
+      }
     }
     return false;
   }
@@ -547,19 +582,71 @@ class Database {
   public function truncate($table){
     try {
 
+      // Check if table exist
+      if(!$this->getTable($table)){
+        throw New Exception("This table does not exist");
+      }
+
       // Generate the SQL query to truncate the table
       $query = 'TRUNCATE TABLE `'.$table.'`';
 
       // Execute the query
       $stmt = $this->execute( $query );
-      $stmt->close();
+
+      // Return boolean
       return true;
     } catch(Exception $e) {
 
-      // Log any errors and throw an exception
+      // Log any errors
       $this->Logger->error($e->getMessage());
-      throw New Exception( $e->getMessage() );
+
+      // Throw an exception if level is higher than 5
+      if($this->Level > 5){
+        throw New Exception( $e->getMessage() );
+      }
     }
     return false;
+  }
+
+  /**
+   * Check for a table in the database.
+   *
+   * @param  string  $table
+   * @return boolean
+   */
+  public function getTable($table) {
+
+    // Generate the SQL query to check if the table exists
+    $query = "SHOW TABLES LIKE '$table'";
+
+    // Execute the query
+    $result = $this->execute($query);
+
+    // Return boolean
+    return $result->num_rows > 0;
+  }
+
+  /**
+   * Retrieve the columns of a table.
+   *
+   * @param  string  $table
+   * @return array
+   */
+  public function getColumns($table) {
+
+    // Generate the SQL query to get the columns of the table
+    $query = "SHOW COLUMNS FROM '$table'";
+
+    // Execute the query
+    $result = $this->execute($query);
+
+    // Fetch the results and store them in an array
+    $columns = array();
+    while ($row = $result->fetch_assoc()) {
+      $columns[] = $row['Field'];
+    }
+
+    // Return the array of columns
+    return $columns;
   }
 }

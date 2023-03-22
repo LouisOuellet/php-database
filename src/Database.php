@@ -609,21 +609,26 @@ class Database {
   }
 
   /**
-   * Check for a table in the database.
+   * Check if a table exists in the database.
    *
    * @param  string  $table
-   * @return boolean
+   * @return bool
+   * @throws Exception
    */
   public function getTable($table) {
+    try {
 
-    // Generate the SQL query to check if the table exists
-    $query = "SHOW TABLES LIKE '$table'";
+      // Retrieve Results
+      $result = $this->connection->query("SHOW TABLES LIKE '$table'");
 
-    // Execute the query
-    $result = $this->execute($query);
+      // Return Boolean based on table existence
+      return $result->num_rows > 0;
+    } catch(Exception $e) {
 
-    // Return boolean
-    return $result->num_rows > 0;
+      // Log any errors and throw an exception
+      $this->Logger->error($e->getMessage());
+      throw new Exception($e->getMessage());
+    }
   }
 
   /**
@@ -631,22 +636,29 @@ class Database {
    *
    * @param  string  $table
    * @return array
+   * @throws Exception
    */
   public function getColumns($table) {
+    try {
 
-    // Generate the SQL query to get the columns of the table
-    $query = "SHOW COLUMNS FROM '$table'";
+      // Retrieve the table's columns
+      $result = $this->connection->query("DESCRIBE $table");
 
-    // Execute the query
-    $result = $this->execute($query);
+      // Initialize the columns array
+      $columns = array();
 
-    // Fetch the results and store them in an array
-    $columns = array();
-    while ($row = $result->fetch_assoc()) {
-      $columns[] = $row['Field'];
+      // Generate the columns array
+      while ($row = $result->fetch_assoc()) {
+        $columns[] = $row['Field'];
+      }
+
+      // Return the array of columns
+      return $columns;
+    } catch(Exception $e) {
+      
+      // Log any errors and throw an exception
+      $this->Logger->error($e->getMessage());
+      throw new Exception($e->getMessage());
     }
-
-    // Return the array of columns
-    return $columns;
   }
 }

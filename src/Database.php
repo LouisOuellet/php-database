@@ -649,13 +649,13 @@ class Database {
 
       // Generate the columns array
       while ($row = $result->fetch_assoc()) {
-        $columns[] = $row['Field'];
+        $columns[$row['Field']] = $row['Type'];
       }
 
       // Return the array of columns
       return $columns;
     } catch(Exception $e) {
-      
+
       // Log any errors and throw an exception
       $this->Logger->error($e->getMessage());
       throw new Exception($e->getMessage());

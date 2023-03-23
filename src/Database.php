@@ -649,7 +649,13 @@ class Database {
 
       // Generate the columns array
       while ($row = $result->fetch_assoc()) {
-        $columns[$row['Field']] = $row['Type'];
+        
+        // Extract the data type from the Type field
+        preg_match('/^([^\(]+)(\(.+?\))?/', $row['Type'], $matches);
+        $dataType = $matches[1];
+
+        // Add column to array
+        $columns[$row['Field']] = $dataType;
       }
 
       // Return the array of columns

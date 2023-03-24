@@ -686,7 +686,11 @@ class Database {
 
         // Generate the required columns array
         while ($row = $result->fetch_assoc()) {
-          if ($row['Null'] == "NO") {
+
+          // Check if the column is required
+          if ($row['Null'] === 'NO' && $row['Default'] === null) {
+
+            // Add column to array
             $requiredColumns[] = $row['Field'];
           }
         }

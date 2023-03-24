@@ -649,7 +649,7 @@ class Database {
 
       // Generate the columns array
       while ($row = $result->fetch_assoc()) {
-        
+
         // Extract the data type from the Type field
         preg_match('/^([^\(]+)(\(.+?\))?/', $row['Type'], $matches);
         $dataType = $matches[1];
@@ -666,5 +666,38 @@ class Database {
       $this->Logger->error($e->getMessage());
       throw new Exception($e->getMessage());
     }
+  }
+
+  /**
+   * Retrieve the required columns for inserting a new row.
+   *
+   * @param  string  $table
+   * @return array
+   * @throws Exception
+   */
+  public function getRequired($table) {
+      try {
+
+        // Retrieve the table's columns
+        $result = $this->connection->query("DESCRIBE $table");
+
+        // Initialize the required columns array
+        $requiredColumns = array();
+
+        // Generate the required columns array
+        while ($row = $result->fetch_assoc()) {
+          if ($row['Null'] == "NO") {
+            $requiredColumns[] = $row['Field'];
+          }
+        }
+
+        // Return the array of required columns
+        return $requiredColumns;
+      } catch(Exception $e) {
+
+        // Log any errors and throw an exception
+        $this->Logger->error($e->getMessage());
+        throw new Exception($e->getMessage());
+      }
   }
 }

@@ -676,32 +676,138 @@ class Database {
    * @throws Exception
    */
   public function getRequired($table) {
-      try {
+    try {
 
-        // Retrieve the table's columns
-        $result = $this->connection->query("DESCRIBE $table");
+      // Retrieve the table's columns
+      $result = $this->connection->query("DESCRIBE $table");
 
-        // Initialize the required columns array
-        $requiredColumns = array();
+      // Initialize the required columns array
+      $requiredColumns = array();
 
-        // Generate the required columns array
-        while ($row = $result->fetch_assoc()) {
+      // Generate the required columns array
+      while ($row = $result->fetch_assoc()) {
 
-          // Check if the column is required
-          if ($row['Null'] === 'NO' && $row['Default'] === null) {
+        // Check if the column is required
+        if ($row['Null'] === 'NO' && $row['Default'] === null) {
 
-            // Add column to array
-            $requiredColumns[] = $row['Field'];
-          }
+          // Add column to array
+          $requiredColumns[] = $row['Field'];
         }
-
-        // Return the array of required columns
-        return $requiredColumns;
-      } catch(Exception $e) {
-
-        // Log any errors and throw an exception
-        $this->Logger->error($e->getMessage());
-        throw new Exception($e->getMessage());
       }
+
+      // Return the array of required columns
+      return $requiredColumns;
+    } catch(Exception $e) {
+
+      // Log any errors and throw an exception
+      $this->Logger->error($e->getMessage());
+      throw new Exception($e->getMessage());
+    }
+  }
+
+  /**
+   * Retrieve the required columns for inserting a new row.
+   *
+   * @param  string  $table
+   * @return array
+   * @throws Exception
+   */
+  public function getDefaults($table) {
+    try {
+
+      // Retrieve the table's columns
+      $result = $this->connection->query("DESCRIBE $table");
+
+      // Initialize the required columns array
+      $requiredColumns = array();
+
+      // Generate the required columns array
+      while ($row = $result->fetch_assoc()) {
+
+        // Check if the column is required
+        if ($row['Default'] !== null) {
+
+          // Add column to array
+          $requiredColumns[] = $row['Default'];
+        }
+      }
+
+      // Return the array of required columns
+      return $requiredColumns;
+    } catch(Exception $e) {
+
+      // Log any errors and throw an exception
+      $this->Logger->error($e->getMessage());
+      throw new Exception($e->getMessage());
+    }
+  }
+
+  /**
+   * Retrieve the columns of a table.
+   *
+   * @param  string  $table
+   * @return array
+   * @throws Exception
+   */
+  public function getOnUpdate($table) {
+    try {
+
+      // Retrieve the table's columns
+      $result = $this->connection->query("DESCRIBE $table");
+
+      // Initialize the columns array
+      $columns = array();
+
+      // Generate the columns array
+      while ($row = $result->fetch_assoc()) {
+
+        // Check if the column has an "ON UPDATE" default value
+        if (strpos($row['Extra'], 'on update') !== false) {
+
+          // Extract the "ON UPDATE" default value from the column's Extra field
+          preg_match('/on update\s+(.+)/i', $row['Extra'], $matches);
+
+          // Add column to array
+          $columns[$row['Field']] = $matches[1];
+        }
+      }
+
+      // Return the array of columns
+      return $columns;
+    } catch(Exception $e) {
+
+      // Log any errors and throw an exception
+      $this->Logger->error($e->getMessage());
+      throw new Exception($e->getMessage());
+    }
+  }
+
+  /**
+   * Retrieve the primary key of a table.
+   *
+   * @param string $table
+   * @return string|null
+   * @throws Exception
+   */
+  public function getPrimary($table) {
+    try {
+      // Retrieve the table's structure
+      $result = $this->connection->query("DESCRIBE $table");
+
+      // Loop through the rows to find the primary key
+      while ($row = $result->fetch_assoc()) {
+        if ($row['Key'] === 'PRI') {
+          return $row['Field'];
+        }
+      }
+
+      // If no primary key was found, return null
+      return null;
+    } catch (Exception $e) {
+
+      // Log any errors and throw an exception
+      $this->Logger->error($e->getMessage());
+      throw new Exception($e->getMessage());
+    }
   }
 }

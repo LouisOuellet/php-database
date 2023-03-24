@@ -718,8 +718,8 @@ class Database {
       // Retrieve the table's columns
       $result = $this->connection->query("DESCRIBE $table");
 
-      // Initialize the required columns array
-      $requiredColumns = array();
+      // Initialize the columns array
+      $columns = array();
 
       // Generate the required columns array
       while ($row = $result->fetch_assoc()) {
@@ -728,12 +728,12 @@ class Database {
         if ($row['Default'] !== null) {
 
           // Add column to array
-          $requiredColumns[] = $row['Default'];
+          $columns[$row['Field']] = $row['Default'];
         }
       }
 
-      // Return the array of required columns
-      return $requiredColumns;
+      // Return the array of columns
+      return $columns;
     } catch(Exception $e) {
 
       // Log any errors and throw an exception

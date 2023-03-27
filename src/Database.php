@@ -810,4 +810,41 @@ class Database {
       throw new Exception($e->getMessage());
     }
   }
+
+  /**
+   * Retrieve the required columns for inserting a new row.
+   *
+   * @param  string  $table
+   * @return array
+   * @throws Exception
+   */
+  public function getNullables($table) {
+    try {
+
+      // Retrieve the table's columns
+      $result = $this->connection->query("DESCRIBE $table");
+
+      // Initialize the columns array
+      $columns = array();
+
+      // Generate the required columns array
+      while ($row = $result->fetch_assoc()) {
+
+        // Check if the column is required
+        if ($row['Null'] !== 'NO') {
+
+          // Add column to array
+          $columns[] = $row['Field'];
+        }
+      }
+
+      // Return the array of columns
+      return $columns;
+    } catch(Exception $e) {
+
+      // Log any errors and throw an exception
+      $this->Logger->error($e->getMessage());
+      throw new Exception($e->getMessage());
+    }
+  }
 }

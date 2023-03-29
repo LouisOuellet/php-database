@@ -33,6 +33,9 @@ This software is distributed under the [GNU General Public License v3.0](https:/
 ## Requirements
 PHP >= 5.5.0
 
+## To Do
+ - Multiple Database Types Support (ex: MariaDB, MySQL, JSON, XML, PostgreSQL, SQLite)
+
 ## Security
 Please disclose any vulnerabilities found responsibly – report security issues to the maintainers privately.
 

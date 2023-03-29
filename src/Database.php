@@ -40,16 +40,11 @@ class Database {
    */
   public function __construct($host = null, $username = null, $password = null, $database = null) {
 
-    // Initialize $Level
-    $Level = $this->Level;
-
     // Set default parameter values if not specified
     if($host == null && defined('DB_HOST')){ $host = DB_HOST; }
     if($username == null && defined('DB_USERNAME')){ $username = DB_USERNAME; }
     if($password == null && defined('DB_PASSWORD')){ $password = DB_PASSWORD; }
     if($database == null && defined('DB_DATABASE')){ $database = DB_DATABASE; }
-    if($Level == null && defined('DB_DEBUG')){ $Level = DB_DEBUG; }
-    if(is_int($Level)){ $this->Level = $Level; }
 
     // Initiate phpLogger
     $this->Logger = new phpLogger(['database' => 'log/database.log']);
@@ -431,7 +426,7 @@ class Database {
    * @return boolean
    * @throws Exception
    */
-  public function create($table, $columns){
+  public function create($table, $columns, $uniqueKeys = null){
     try {
 
       // Check if table exist
@@ -460,6 +455,15 @@ class Database {
               }
             }
           }
+        }
+      }
+
+      // Add UNIQUE KEY constraints if provided
+      if (!empty($uniqueKeys) && is_array($uniqueKeys)) {
+        foreach ($uniqueKeys as $keyName => $keyColumns) {
+          $query .= ', UNIQUE KEY `' . $keyName . '` (' . implode(', ', array_map(function ($col) {
+            return '`' . $col . '`';
+          }, $keyColumns)) . ')';
         }
       }
 
@@ -492,49 +496,55 @@ class Database {
    * @return boolean
    * @throws Exception
    */
-  public function alter($table, $columns){
-    try {
+   public function alter($table, $columns){
+   try {
 
-      // Check if table exist
-      if(!$this->getTable($table)){
-        throw New Exception("This table does not exist");
-      }
+     // Check if table exist
+     if(!$this->getTable($table)){
+       throw New Exception("This table does not exist");
+     }
 
-      // Loop through each column and add it to the query
-      foreach($columns as $name => $column){
-        if(isset($column['action']) && in_array(strtoupper($column['action']),['MODIFY','ADD','DROP COLUMN'])){
-          if(isset($column['type'])){
+     // Loop through each column and add it to the query
+     foreach($columns as $name => $column){
+       if(isset($column['action'])){
+         // Build the query string based on the action specified
+         $query = 'ALTER TABLE `'.$table.'` ';
 
-            // Build the query string based on the action specified
-            $query = 'ALTER TABLE `'.$table.'` DEFAULT CHARACTER SET ' . $this->character . ', '.strtoupper($column['action']).' `'.$name.'` '.strtoupper($column['type']);
+         if(in_array(strtoupper($column['action']),['MODIFY','ADD','DROP COLUMN']) && isset($column['type'])){
+           $query .= strtoupper($column['action']).' `'.$name.'` '.strtoupper($column['type']);
 
-            // Loop through any extra options and add them to the query
-            if(isset($column['extra']) && is_array($column['extra'])){
-              foreach($column['extra'] as $extra){
-                if(in_array(strtoupper($extra),['NULL','NOT NULL','UNIQUE','UNSIGNED','AUTO_INCREMENT','PRIMARY KEY']) || str_contains(strtoupper($extra), 'DEFAULT')){
-                  $query .= ' '.strtoupper($extra);
-                }
-              }
-            }
+           // Loop through any extra options and add them to the query
+           if(isset($column['extra']) && is_array($column['extra'])){
+             foreach($column['extra'] as $extra){
+               if(in_array(strtoupper($extra),['NULL','NOT NULL','UNIQUE','UNSIGNED','AUTO_INCREMENT','PRIMARY KEY']) || str_contains(strtoupper($extra), 'DEFAULT')){
+                 $query .= ' '.strtoupper($extra);
+               }
+             }
+           }
+         } elseif (strtoupper($column['action']) == 'ADD UNIQUE KEY' && isset($column['keyName']) && isset($column['columns']) && is_array($column['columns'])) {
+           // Add unique key on multiple columns
+           $query .= 'ADD UNIQUE KEY `'.$column['keyName'].'` ('.implode(', ', array_map(function($col) { return "`$col`"; }, $column['columns'])).')';
+         } else {
+           continue; // Skip to next iteration if the action is not supported
+         }
 
-            // Execute the query
-            $stmt = $this->execute( $query );
-          }
-        }
-      }
-      return true;
-    } catch(Exception $e) {
+         // Execute the query
+         $stmt = $this->execute( $query );
+       }
+     }
+     return true;
+   } catch(Exception $e) {
 
-      // Log any errors
-      $this->Logger->error($e->getMessage());
+     // Log any errors
+     $this->Logger->error($e->getMessage());
 
-      // Throw an exception if level is higher than 5
-      if($this->Level > 5){
-        throw New Exception( $e->getMessage() );
-      }
-    }
-    return false;
-  }
+     // Throw an exception if level is higher than 5
+     if($this->Level > 5){
+       throw New Exception( $e->getMessage() );
+     }
+   }
+   return false;
+ }
 
   /**
    * Drop a table from the database.

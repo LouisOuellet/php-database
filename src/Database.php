@@ -3,6 +3,9 @@
 //Declaring namespace
 namespace LaswitchTech\phpDB;
 
+//Import phpConfigurator class into the global namespace
+use LaswitchTech\phpConfigurator\phpConfigurator;
+
 //Import phpLogger class into the global namespace
 use LaswitchTech\phpLogger\phpLogger;
 
@@ -28,41 +31,62 @@ class Database {
 	// NetTools
 	private $NetTools;
 
+  // Configurator
+  private $Configurator = null;
+
+  // Database
+  private $Host = null;
+  private $Username = null;
+  private $Password = null;
+  private $Database = null;
+
   /**
    * Create a new Database instance.
    *
-   * @param  string|null  $host
-   * @param  string|null  $username
-   * @param  string|null  $password
-   * @param  string|null  $database
+   * @param  string|null  $Host
+   * @param  string|null  $Username
+   * @param  string|null  $Password
+   * @param  string|null  $Database
    * @return void
    * @throws Exception
    */
-  public function __construct($host = null, $username = null, $password = null, $database = null) {
+  public function __construct($Host = null, $Username = null, $Password = null, $Database = null) {
 
-    // Set default parameter values if not specified
-    if($host == null && defined('DB_HOST')){ $host = DB_HOST; }
-    if($username == null && defined('DB_USERNAME')){ $username = DB_USERNAME; }
-    if($password == null && defined('DB_PASSWORD')){ $password = DB_PASSWORD; }
-    if($database == null && defined('DB_DATABASE')){ $database = DB_DATABASE; }
+    // Initialize Configurator
+    $this->Configurator = new phpConfigurator('database');
+
+    // Retrieve Log Level
+    $this->Level = $this->Configurator->get('logger', 'level') ?: $this->Level;
 
     // Initiate phpLogger
-    $this->Logger = new phpLogger(['database' => 'log/database.log']);
-
-    // Configure phpLogger
-    $this->Logger->config('ip',true);
-    $this->Logger->config('rotation',false);
-    $this->Logger->config('level',$this->Level);
+    $this->Logger = new phpLogger('database');
 
     // Initiate phpNet
     $this->NetTools = new phpNet();
 
-    // Configure phpNet
-    $this->NetTools->config('level',$this->Level);
+    // Retrieve Parameters
+    $this->Host = $Host ?: $this->Host;
+    $this->Username = $Username ?: $this->Username;
+    $this->Password = $Password ?: $this->Password;
+    $this->Database = $Database ?: $this->Database;
+
+    // Set default parameter values if not specified
+    if($this->Host === null){
+      $this->Host = $this->Configurator->get('database', 'host') ?: $this->Host;
+    }
+    if($this->Username === null){
+      $this->Username = $this->Configurator->get('database', 'username') ?: $this->Username;
+    }
+    if($this->Password === null){
+      $this->Password = $this->Configurator->get('database', 'password') ?: $this->Password;
+    }
+    if($this->Database === null){
+      $this->Database = $this->Configurator->get('database', 'database') ?: $this->Database;
+    }
 
     // Attempt a connection to the database
-    if($host !== null && $username !== null && $password !== null && $database !== null){
-      $this->connect($host,$username,$password,$database);
+    if($this->Host !== null && $this->Username !== null && $this->Password !== null && $this->Database !== null){
+      $this->connect($this->Host,$this->Username,$this->Password,$this->Database);
     }
   }
 
@@ -78,17 +102,65 @@ class Database {
 		try {
 			if(is_string($option)){
 	      switch($option){
+	        case"host":
+	          if(is_string($value)){
+
+							// Logging Level
+	            $this->Host = $value;
+
+              // Save to Configurator
+              $this->Configurator->set('database',$option, $value);
+	          } else{
+	            throw new Exception("2nd argument must be a string.");
+	          }
+	          break;
+	        case"username":
+	          if(is_string($value)){
+
+							// Logging Level
+	            $this->Username = $value;
+
+              // Save to Configurator
+              $this->Configurator->set('database',$option, $value);
+	          } else{
+	            throw new Exception("2nd argument must be a string.");
+	          }
+	          break;
+	        case"password":
+	          if(is_string($value)){
+
+							// Logging Level
+	            $this->Password = $value;
+
+              // Save to Configurator
+              $this->Configurator->set('database',$option, $value);
+	          } else{
+	            throw new Exception("2nd argument must be a string.");
+	          }
+	          break;
+	        case"database":
+	          if(is_string($value)){
+
+							// Logging Level
+	            $this->Database = $value;
+
+              // Save to Configurator
+              $this->Configurator->set('database',$option, $value);
+	          } else{
+	            throw new Exception("2nd argument must be a string.");
+	          }
+	          break;
 	        case"level":
 	          if(is_int($value)){
 
 							// Logging Level
 	            $this->Level = $value;
 
-							// Configure phpLogger
-					    $this->Logger->config('level',$this->Level);
-
 							// Configure phpNet
               $this->NetTools->config('level',$this->Level);
+
+							// Configure phpLogger
+					    $this->Logger->config('level',$this->Level);
 	          } else{
 	            throw new Exception("2nd argument must be an integer.");
 	          }

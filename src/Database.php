@@ -84,7 +84,7 @@ class Database {
       $this->Database = $this->Configurator->get('database', 'database') ?: $this->Database;
     }
 
-    // Attempt a connection to the database
+    // Attempt a connection
     if($this->Host !== null && $this->Username !== null && $this->Password !== null && $this->Database !== null){
       $this->connect($this->Host,$this->Username,$this->Password,$this->Database);
     }

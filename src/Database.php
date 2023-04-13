@@ -26,7 +26,6 @@ class Database {
 
 	// Logger
 	private $Logger;
-	private $Level = 1;
 
 	// NetTools
 	private $NetTools;
@@ -54,9 +53,6 @@ class Database {
 
     // Initialize Configurator
     $this->Configurator = new phpConfigurator('database');
-
-    // Retrieve Log Level
-    $this->Level = $this->Configurator->get('logger', 'level') ?: $this->Level;
 
     // Initiate phpLogger
     $this->Logger = new phpLogger('database');

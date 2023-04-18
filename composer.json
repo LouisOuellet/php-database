@@ -18,7 +18,8 @@
     },
     "autoload": {
         "psr-4": {
-            "LaswitchTech\\phpDB\\": "src/"
+            "LaswitchTech\\phpDB\\": "src/",
+            "LaswitchTech\\phpDatabase\\": "src/"
         }
     }
 }

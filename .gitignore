@@ -6,9 +6,10 @@ composer.phar
 /tmp/
 /log/
 /config/
+/schema/
+/backup/
 /Controller/
 /Model/
-example.php
 *.cfg
 *.log
 

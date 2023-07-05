@@ -20,6 +20,9 @@ The class uses prepared statements to prevent SQL injection attacks and supports
  - Easy and secure interaction with a SQL database
  - Debugging functionality
  - Simplified handling of common SQL tasks
+ - Backup and restore your database
+ - Create database schema for future upgrades
+ - Upgrade database to a new schema
 
 ## Why you might need it?
 phpDB is a simple and easy-to-use PHP class that provides an interface for interacting with a MySQL database using the mysqli extension. If you're building a web application or website that needs to store and retrieve data from a MySQL database, then phpDB can save you a lot of time and effort. The class provides methods for creating, reading, updating, and deleting data from a database, as well as for creating and modifying database tables. It uses prepared statements to prevent SQL injection attacks and supports UTF-8 encoding, which ensures that your data is stored and retrieved accurately. Additionally, phpDB includes debugging functionality that allows you to log queries and parameters to a file, making it easier to troubleshoot issues with your database. Whether you're a beginner or an experienced developer, phpDB can simplify your database interactions and help you get your web application up and running quickly.
@@ -277,4 +280,82 @@ $result = $phpDB->delete("DELETE FROM users WHERE id = ?", [$users[0]['id']]);
 
 //Output Result
 echo json_encode($result, JSON_PRETTY_PRINT) . PHP_EOL;
+```
+
+#### Backup
+
+```php
+
+//Import Database class into the global namespace
+//These must be at the top of your script, not inside a function
+use LaswitchTech\phpDB\Database;
+
+//Load Composer's autoloader
+require 'vendor/autoload.php';
+
+//Connect SQL Database
+$phpDB = new Database("localhost","demo","demo","demo");
+
+//Backup Database
+$result = $phpDB->backup();
+
+//Output Result
+echo json_encode($result, JSON_PRETTY_PRINT) . PHP_EOL;
+```
+
+#### Restore
+
+```php
+
+//Import Database class into the global namespace
+//These must be at the top of your script, not inside a function
+use LaswitchTech\phpDB\Database;
+
+//Load Composer's autoloader
+require 'vendor/autoload.php';
+
+//Connect SQL Database
+$phpDB = new Database("localhost","demo","demo","demo");
+
+//Restore Database
+$phpDB->restore();
+```
+
+#### Schema
+
+```php
+
+//Import Database class into the global namespace
+//These must be at the top of your script, not inside a function
+use LaswitchTech\phpDB\Database;
+
+//Load Composer's autoloader
+require 'vendor/autoload.php';
+
+//Connect SQL Database
+$phpDB = new Database("localhost","demo","demo","demo");
+
+//Create a Database Schema
+$result = $phpDB->schema();
+
+//Output Result
+echo json_encode($result, JSON_PRETTY_PRINT) . PHP_EOL;
+```
+
+#### Upgrade
+
+```php
+
+//Import Database class into the global namespace
+//These must be at the top of your script, not inside a function
+use LaswitchTech\phpDB\Database;
+
+//Load Composer's autoloader
+require 'vendor/autoload.php';
+
+//Connect SQL Database
+$phpDB = new Database("localhost","demo","demo","demo");
+
+//Upgrade Database to Latest Schema
+$phpDB->upgrade();
 ```

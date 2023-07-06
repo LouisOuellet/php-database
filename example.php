@@ -84,7 +84,7 @@ function insert(){
     // Check if table exists (optional)
     if($phpDB->getTable("version")){
       // Insert data
-      $version = $phpDB->insert("INSERT INTO version (version) VALUES (?)", [1]);
+      $version = $phpDB->insert("INSERT INTO version (database) VALUES (?)", [1]);
     }
   }
 }
@@ -96,7 +96,7 @@ function select(){
     // Check if table exists (optional)
     if($phpDB->getTable("version")){
       // Select data
-      $version = $phpDB->select("SELECT * FROM version WHERE version = ?", [1]);
+      $version = $phpDB->select("SELECT * FROM version WHERE database = ?", [1]);
     }
   }
 }
@@ -108,7 +108,7 @@ function update(){
     // Check if table exists (optional)
     if($phpDB->getTable("version")){
       // Update data
-      $version = $phpDB->update("UPDATE version SET version = ? WHERE version = ?", [2,1]);
+      $version = $phpDB->update("UPDATE version SET database = ? WHERE database = ?", [2,1]);
     }
   }
 }
@@ -120,7 +120,7 @@ function delete(){
     // Check if table exists (optional)
     if($phpDB->getTable("version")){
       // Delete data
-      $version = $phpDB->delete("DELETE FROM version WHERE version = ?", [2]);
+      $version = $phpDB->delete("DELETE FROM version WHERE database = ?", [2]);
     }
   }
 }
@@ -221,7 +221,7 @@ function advanced(){
     // Insert data
     $id = $phpDB->insert("INSERT INTO users (username, password, token, email) VALUES (?,?,?,?)", ["user","pass","token","user@domain.com"]);
     // Update version
-    $phpDB->update("UPDATE version SET version = ?", ['2']);
+    $phpDB->update("UPDATE version SET database = ?", ['2']);
     // Create a new schema
     schema();
     // Back up the database

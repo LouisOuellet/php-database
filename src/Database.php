@@ -1212,7 +1212,7 @@ class Database {
 			}
 
 			// Update the database version
-			$this->execute("UPDATE version SET version = $version");
+			$this->execute("UPDATE version SET database = $version");
 
 			$this->Logger->success("Database upgraded to version: " . $version);
 		} catch(Exception $e) {

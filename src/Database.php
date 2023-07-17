@@ -929,7 +929,7 @@ class Database {
 	 * @param  string  $value
 	 * @return boolean
 	 */
-	private function getLastCreatedFile($path) {
+	private function getLastCreatedFile($path, $extension = 'sql') {
 		// Initialize variables to store the name and creation time of the latest file
 		$latestFilePath = '';
 		$latestFileTime = 0;
@@ -943,8 +943,13 @@ class Database {
 			while (false !== ($entry = readdir($directoryHandle))) {
 				// Skip non-files (like ".", "..", or subdirectories)
 				if (is_file($path . '/' . $entry) && filectime($path . '/' . $entry) > $latestFileTime) {
-					$latestFilePath = $path . '/' . $entry;
-					$latestFileTime = filectime($latestFilePath);
+
+					// Check if the file extension matches the provided extension
+					$fileExtension = pathinfo($entry, PATHINFO_EXTENSION);
+					if ($fileExtension === $extension) {
+						$latestFilePath = $path . '/' . $entry;
+						$latestFileTime = filectime($latestFilePath);
+					}
 				}
 			}
 			// Close the directory handle
@@ -960,11 +965,15 @@ class Database {
 	 * @return string $file
 	 * @throws Exception
 	 */
-	public function backup() {
+	public function backup($filename = null) {
 		try {
 
-			// Convert file to absolute path
-			$file = $this->Configurator->root() . "/backup/" . time() . ".sql";
+			// If no filename was provided, generate a filename
+			if (is_null($filename)) {
+				$file = $this->Configurator->root() . "/backup/" . time() . ".sql";
+			} else {
+				$file = $this->Configurator->root() . "/backup/" . $filename . ".sql";
+			}
 
 			$this->Logger->info("Creating backup of database to file: " . $file);
 
@@ -1064,15 +1073,25 @@ class Database {
 	 *
 	 * @throws Exception
 	 */
-	public function schema() {
+	public function schema($filename = null) {
 		try {
 
 			// Get the current database version
 			$result = $this->query("SELECT version FROM version");
 			$currentVersion = $result[0]['version'];
 
-			// Convert file to absolute path
-			$file = $this->Configurator->root() . "/schema/" . $currentVersion . ".map";
+			// If no filename was provided, generate a filename
+			if (is_null($filename)) {
+
+				// Convert file to absolute path
+				$file = $this->Configurator->root() . "/schema/" . $currentVersion . ".map";
+			} else {
+
+				// Convert file to absolute path
+				$file = $this->Configurator->root() . "/schema/" . $filename . ".map";
+			}
+
+			
 
 			// Create the directory recursively
 			if(!is_dir(dirname($file))){

@@ -968,6 +968,11 @@ class Database {
 	public function backup($filename = null) {
 		try {
 
+			// Check if database is connected
+			if (!$this->isConnected()) {
+				throw new Exception("Database is not connected");
+			}
+
 			// If no filename was provided, generate a filename
 			if (is_null($filename)) {
 				$file = $this->Configurator->root() . "/backup/" . time() . ".sql";
@@ -1028,6 +1033,11 @@ class Database {
 	public function restore($file = null) {
 		try {
 
+			// Check if database is connected
+			if (!$this->isConnected()) {
+				throw new Exception("Database is not connected");
+			}
+
 			if($file){
 				// Convert file to absolute path
 				$file = $this->Configurator->root() . $file;
@@ -1075,6 +1085,11 @@ class Database {
 	 */
 	public function schema($filename = null) {
 		try {
+
+			// Check if database is connected
+			if (!$this->isConnected()) {
+				throw new Exception("Database is not connected");
+			}
 
 			// Get the current database version
 			$result = $this->query("SELECT version FROM version");
@@ -1139,6 +1154,13 @@ class Database {
 	 */
 	public function upgrade($version = null) {
 		try {
+
+			// Check if database is connected
+			if (!$this->isConnected()) {
+				throw new Exception("Database is not connected");
+			}
+
+			// Check if the version is specified
 			if($version){
 				// Select File
 				$versionFile = $this->Configurator->root() . "/schema/" . intval($version) . ".map";
